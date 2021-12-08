@@ -2,44 +2,44 @@
 
 {% block content %}
 <section class="container">
-  <form style="max-width: 500px; margin: 0 auto;" class="mt-4" action="{% url 'submit' %}" method="POST">
-    {% csrf_token %}
+    <form style="max-width: 500px; margin: 0 auto;" class="mt-4" action="{% url 'submit' %}" method="POST">
+        {% csrf_token %}
 <!--     <div class="mb-3">
-      <label for="first_name" class="form-label">First name</label>
-      <input type="text" name="first_name" class="form-control" id="first_name" required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="last_name" class="form-label">Last name</label>
-      <input type="text" name="last_name" class="form-control" id="last_name" required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="unique_id" class="form-label">Unique ID</label>
-      <input type="text" name="unique_id" class="form-control" id="unique_id" required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="phone_no" class="form-label">Phone No</label>
-      <input type="nuber" name="phone_no" class="form-control" id="phone_no" required
-      />
-    </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" name="password" class="form-control" id="password" required
-      />
-    </div> -->
-    <div class="mb-3">
-      <label for="candidate" class="form-label">Candidate</label>
-      <select class="form-select" name="candidate" required>
-        <option value="">Please select candidate</option>
-        {% for candidate in candidates %}
-          <option value="{{ candidate }}">{{candidate}}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+            <label for="first_name" class="form-label">First name</label>
+            <input type="text" name="first_name" class="form-control" id="first_name" required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="last_name" class="form-label">Last name</label>
+            <input type="text" name="last_name" class="form-control" id="last_name" required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="unique_id" class="form-label">Unique ID</label>
+            <input type="text" name="unique_id" class="form-control" id="unique_id" required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="phone_no" class="form-label">Phone No</label>
+            <input type="nuber" name="phone_no" class="form-control" id="phone_no" required
+            />
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" id="password" required
+            />
+        </div> -->
+        <div class="mb-3">
+            <label for="candidate" class="form-label">Candidate</label>
+            <select class="form-select" name="candidate" required>
+                <option value="">Please select candidate</option>
+                {% for candidate in candidates %}
+                    <option value="{{ candidate }}">{{candidate}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </section>
 
 {% endblock content %}
