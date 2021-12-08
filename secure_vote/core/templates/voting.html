@@ -4,7 +4,7 @@
 <section class="container">
   <form style="max-width: 500px; margin: 0 auto;" class="mt-4" action="{% url 'submit' %}" method="POST">
     {% csrf_token %}
-    <div class="mb-3">
+<!--     <div class="mb-3">
       <label for="first_name" class="form-label">First name</label>
       <input type="text" name="first_name" class="form-control" id="first_name" required
       />
@@ -28,7 +28,7 @@
       <label for="password" class="form-label">Password</label>
       <input type="password" name="password" class="form-control" id="password" required
       />
-    </div>
+    </div> -->
     <div class="mb-3">
       <label for="candidate" class="form-label">Candidate</label>
       <select class="form-select" name="candidate" required>

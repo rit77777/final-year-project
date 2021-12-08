@@ -113,10 +113,8 @@ def submit(request):
 	if request.method == 'POST':
 		data = request.POST
 
-		bools = True
-
-		if bools:
-			hash_string = request.POST.get('first_name') + request.POST.get('last_name') + request.POST.get('password') + request.POST.get('unique_id')
+		if request.user.is_authenticated:
+			hash_string = str(request.user.username) + str(request.user.email) + str(request.user.name) + str(request.user.phone) + str(request.user.age)
 			hashed_value = sha256(hash_string.encode()).hexdigest()
 
 			post_object = {
@@ -124,7 +122,7 @@ def submit(request):
 				'voterhash': hashed_value
 			}
 
-			requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json; charset=utf-8'})
+			requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json'})
 
 			return render(request, 'success.html', {'voter_details': data})
 		else:
@@ -140,6 +138,7 @@ def submit(request):
 ############################################################################################
 
 @csrf_exempt
+# @login_required(login_url='login')
 def new_transaction(request):
 	if request.method == 'POST':
 		transaction_data = json.loads(request.body)
@@ -172,6 +171,7 @@ def get_chain(request):
 	return JsonResponse(data, safe=False, status=200)
 
 
+# @login_required(login_url='login')
 def mine_block(request):
 	result = blockchain.mine()
 	if not result:
@@ -180,5 +180,6 @@ def mine_block(request):
 		return JsonResponse(f"Block #{blockchain.last_block.index} is mined. Your vote is now added to the blockchain", safe=False, status=201)
 
 
+# @login_required(login_url='login')
 def pending_transaction(request):
 	return JsonResponse({'pending': blockchain.unconfirmed_transactions }, status=200)
