@@ -11,12 +11,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
-# from .forms import VoterCreationForm
 
 
 blockchain = Blockchain()
 
 blockchain.create_genesis_block()
+
+candidates = Candidate.objects.all()
+candidates = list(candidates)
+
+blockchain.create_candidates(candidates)
+
 
 URL = "http://127.0.0.1:8000"
 
@@ -103,8 +108,13 @@ def mine(request):
 
 @login_required(login_url='login')
 def voting(request):
-	candidate = Candidate.objects.all()
-	return render(request, 'voting.html', {'candidates': candidate})
+	print(request.user.vote_done)
+	if request.user.vote_done:
+		messages.error(request, 'You cannot vote more than once')
+		return redirect('home')
+	else:
+		candidates = Candidate.objects.all()
+		return render(request, 'voting.html', {'candidates': candidates})
 
 
 @login_required(login_url='login')
@@ -124,13 +134,25 @@ def submit(request):
 
 			requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json'})
 
+			# print(response)
+
+			# if response.status_code == 201:
+			# 	# request.user.vote_done = True
+			# 	return render(request, 'success.html', {'voter_details': data})
+			# else:
+			# 	return render(request, 'error.html', {'error_message': json.loads(response.error)})
+
 			return render(request, 'success.html', {'voter_details': data})
 		else:
-			return render(request, 'error.html', {'message': "NOT VALID"})
+			return render(request, 'error.html', {'error_message': "NOT VALID"})
 
 
 # all votes page
-
+@login_required(login_url='login')
+def count_votes(request):
+	data = blockchain.get_result()
+	print(data)
+	return render('count.html', {'vote_count': blockchain.count_votes})
 
 
 
@@ -150,7 +172,7 @@ def new_transaction(request):
 				return JsonResponse("Invalid transaction data", safe=False, status=404) 
 
 		if (transaction_data["voterhash"] in blockchain.voted):
-			return JsonResponse('Cannot vote more than once')
+			return JsonResponse({'error': 'Cannot vote more than once'}, status=400)
 
 		transaction_data["timestamp"] = str(datetime.datetime.now())
 

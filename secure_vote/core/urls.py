@@ -15,7 +15,7 @@ urlpatterns = [
     path('voting/', views.voting, name='voting'),
     # path('all_votes/', views.all_votes, name='all_votes'),
     path('submit/', views.submit, name='submit'),
-    # path('count_votes/', views.count_votes, name='count_votes'),
+    path('count_votes/', views.count_votes, name='count_votes'),
 
     ########################################################
     path('new_transaction/', views.new_transaction, name='new_transaction'),

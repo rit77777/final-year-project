@@ -2,6 +2,8 @@ from hashlib import sha256
 import datetime
 import json
 
+from .models import Candidate
+
 
 class Block:
     def __init__(self, index, transactions, timestamp, previous_hash, nonce=0):
@@ -24,12 +26,24 @@ class Blockchain:
         self.unconfirmed_transactions = []
         self.chain = []
         self.voted = []
+        self.candidates = []
+        self.count_votes = {}
 
 
     def create_genesis_block(self):
         genesis_block = Block(0, [], str(datetime.datetime.now()), "0")
         genesis_block.hash = genesis_block.compute_hash()
         self.chain.append(genesis_block)
+
+
+    def create_candidates(self, candidates):
+        # candidates_value = json.loads(candidates)
+        for candidate in candidates:
+            # print(candidate.candidate_name)
+            self.candidates.append(candidate.candidate_name)
+        # print(self.candidates)
+        for i in range(len(self.candidates)):
+            self.count_votes.update({self.candidates[i]: 0})
 
 
     @property
@@ -61,7 +75,10 @@ class Blockchain:
 
         return computed_hash
 
+
     def add_new_transaction(self, transaction):
+        self.voted.append(transaction['voterhash'])
+        self.count_votes[transaction['candidate']] += 1
         self.unconfirmed_transactions.append(transaction)
 
 
@@ -101,3 +118,7 @@ class Blockchain:
 
         self.unconfirmed_transactions = []
         return True
+
+
+    def get_result(self):
+        return self.count_votes
