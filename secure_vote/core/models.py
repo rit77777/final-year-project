@@ -22,7 +22,10 @@ class UniqueID(models.Model):
 
 class Candidate(models.Model):
     candidate_id = models.CharField(max_length=10, primary_key=True)
-    candidate_name = models.CharField(max_length=100)
+    candidate_name = models.CharField(max_length=100, null=True)
+    party_name = models.CharField(max_length=100, null=True)
+    party_logo = models.CharField(max_length=500, blank=True)
+    candidate_pic = models.CharField(max_length=500, blank=True)
 
     def __str__(self):
         return self.candidate_name
@@ -33,8 +36,8 @@ class RegisteredVoters(AbstractUser):
     name = models.CharField(max_length=200, null=True)
     email = models.EmailField(unique=True, null=True)
     phone = models.CharField(max_length=10, unique=True, null=True)
-    age = models.IntegerField(default = 0)
-    vote_done = models.BooleanField(default = False)
+    age = models.IntegerField(default=0)
+    vote_done = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELD = []

@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<section>
-    <div class="px-4 py-5 my-5 text-center">
-        <h1 class="display-5 fw-bold">Result</h1>
-        <table class="table table-striped">
-         <thead>
-            <tr >
-              <th style="text-align:center" scope="col">Candidate Name</th>
-              <th style="text-align:center" scope="col">No of Votes</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for key, value in vote_count.items %}
-            <tr>
-                <td>{{ key }}</td>
-                <td>{{ value }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-    </div>
+<section style="max-width: 600px; margin: 0 auto;" class="mt-4" class="container">
+		<div class="px-4 py-5 my-5 text-center">
+				<h1 class="display-5 fw-bold">Result</h1>
+				<table class="table table-striped">
+				 <thead>
+						<tr >
+							<th style="text-align:center" scope="col">Candidate Name</th>
+							<th style="text-align:center" scope="col">No of Votes</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for key, value in vote_count.items %}
+						<tr>
+							<td>{{ key }}</td>
+							<td>{{ value }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+		</div>
 </section>
 {% endblock %}

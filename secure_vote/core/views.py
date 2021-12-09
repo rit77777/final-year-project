@@ -198,7 +198,7 @@ def new_transaction(request):
 
         for field in required_fields:
             if not transaction_data.get(field):
-                return JsonResponse("Invalid transaction data", safe=False, status=404) 
+                return JsonResponse({'error': 'Invalid transaction data'}, safe=False, status=404) 
 
         if (transaction_data["voterhash"] in blockchain.voted):
             return JsonResponse({'error': 'You cannot vote more than once'}, status=400)
