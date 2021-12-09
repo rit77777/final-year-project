@@ -1,17 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
 <section>
-    <h1 class="display-5 fw-bold">Error</h1>
-    <div class="col-lg-6 mx-auto">
-        <p class="lead mb-4">Invalid credentials</p>
-        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-            <button
-              type="button"
-              class="btn btn-primary btn-lg px-5 gap-3"
-              onclick="location.href='/'"
-            >
-              Back
-            </button>
+    <div class="px-4 py-5 my-5 text-center">
+        <div class="alert alert-danger" role="alert">
+            <h1 class="alert-heading">Error</h4>
+            <p>{{error_message}}</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <a type="button" class="btn btn-light btn-lg px-5 gap-3" href="{% url 'home' %}">Back</a>
+            </div>
         </div>
     </div>
 </section>

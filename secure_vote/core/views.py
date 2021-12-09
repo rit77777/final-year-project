@@ -5,7 +5,7 @@ import json
 from hashlib import sha256
 from django.http import JsonResponse
 
-from .models import Candidate, RegisteredVoters
+from .models import Candidate, RegisteredVoters, UniqueID
 from .blockchain import Blockchain
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
@@ -27,9 +27,9 @@ URL = "http://127.0.0.1:8000"
 
 #########################################################################################
 
+
 def register_page(request):
     if request.method == 'POST':
-    # Get form values
         username = request.POST.get('username')
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -38,23 +38,52 @@ def register_page(request):
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
 
-        # Check if passwords match
-        if password == password2:
-            # Check username
-            if RegisteredVoters.objects.filter(username=username).exists():
-                messages.error(request, 'That username is taken')
-                return redirect('register')
-            else:
-                if RegisteredVoters.objects.filter(email=email).exists():
-                    messages.error(request, 'That email is being used')
-                    return redirect('register')
-                else:
-                    user = RegisteredVoters.objects.create_user(username=username, name=name, email=email, phone=phone, age=age, password=password)
-                    user.save()
-                    messages.success(request, 'You are now registered and can log in')
-                    return redirect('login')
-        else:
+        try:
+            unique_id_details = UniqueID.objects.get(unique_id=username)
+        except:
+            messages.error(request, 'Unique id doesnot exists')
+            return redirect('register')
+
+
+        if username != unique_id_details.unique_id:
+            messages.error(request, 'Unique id is invalid')
+            return redirect('register')
+
+        if email != unique_id_details.email:
+            messages.error(request, 'email does not match unique id email')
+            return redirect('register')
+
+        if phone != unique_id_details.phone:
+            messages.error(request, 'phone no does not match unique id email')
+            return redirect('register')
+
+        if int(age) < 18:
+            messages.error(request, 'You must be 18+ to vote')
+            return redirect('register')
+
+        if password != password2:
             messages.error(request, 'Passwords do not match')
+            return redirect('register')
+
+        if RegisteredVoters.objects.filter(username=username).exists():
+            messages.error(request, 'That username is taken')
+            return redirect('register')
+
+        if RegisteredVoters.objects.filter(email=email).exists():
+            messages.error(request, 'That email is already registered')
+            return redirect('register')
+
+        if RegisteredVoters.objects.filter(phone=phone).exists():
+            messages.error(request, 'That phone no is already registered')
+            return redirect('register')
+
+        try:
+            user = RegisteredVoters.objects.create_user(username=username, name=name, email=email, phone=phone, age=age, password=password)
+            user.save()
+            messages.success(request, 'You are now registered and can log in')
+            return redirect('login')
+        except:
+            messages.error(request, 'error while registering')
             return redirect('register')
     else:
         return render(request, 'register.html')
@@ -83,7 +112,6 @@ def logout_page(request):
     messages.success(request, 'You are now logged out')
     return redirect('home')
 
-######################################################################################### 
 
 @login_required(login_url='login')
 def home(request):
@@ -108,7 +136,6 @@ def mine(request):
 
 @login_required(login_url='login')
 def voting(request):
-    print(request.user.vote_done)
     if request.user.vote_done:
         messages.error(request, 'You cannot vote more than once')
         return redirect('home')
@@ -124,6 +151,7 @@ def submit(request):
         data = request.POST
 
         if request.user.is_authenticated:
+            voter = RegisteredVoters.objects.get(username=request.user.username)
             hash_string = str(request.user.username) + str(request.user.email) + str(request.user.name) + str(request.user.phone) + str(request.user.age)
             hashed_value = sha256(hash_string.encode()).hexdigest()
 
@@ -132,15 +160,17 @@ def submit(request):
                 'voterhash': hashed_value
             }
 
-            requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json'})
+            response = requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json'})
 
-            # print(response)
+            response_data = response.json()
+            print(response_data)
 
-            # if response.status_code == 201:
-            #   # request.user.vote_done = True
-            #   return render(request, 'success.html', {'voter_details': data})
-            # else:
-            #   return render(request, 'error.html', {'error_message': json.loads(response.error)})
+            if response.status_code == 201:
+              voter.vote_done = True
+              voter.save()
+              return render(request, 'success.html', {'voter_details': data})
+            else:
+              return render(request, 'error.html', {'error_message': response_data['error']})
 
             return render(request, 'success.html', {'voter_details': data})
         else:
@@ -152,7 +182,7 @@ def submit(request):
 def count_votes(request):
     data = blockchain.get_result()
     print(data)
-    return render('count.html', {'vote_count': blockchain.count_votes})
+    return render(request, 'count_votes.html', {'vote_count': data})
 
 
 
@@ -160,7 +190,6 @@ def count_votes(request):
 ############################################################################################
 
 @csrf_exempt
-# @login_required(login_url='login')
 def new_transaction(request):
     if request.method == 'POST':
         transaction_data = json.loads(request.body)
@@ -172,7 +201,7 @@ def new_transaction(request):
                 return JsonResponse("Invalid transaction data", safe=False, status=404) 
 
         if (transaction_data["voterhash"] in blockchain.voted):
-            return JsonResponse({'error': 'Cannot vote more than once'}, status=400)
+            return JsonResponse({'error': 'You cannot vote more than once'}, status=400)
 
         transaction_data["timestamp"] = str(datetime.datetime.now())
 
@@ -193,7 +222,6 @@ def get_chain(request):
     return JsonResponse(data, safe=False, status=200)
 
 
-# @login_required(login_url='login')
 def mine_block(request):
     result = blockchain.mine()
     if not result:
@@ -202,6 +230,5 @@ def mine_block(request):
         return JsonResponse(f"Block #{blockchain.last_block.index} is mined. Your vote is now added to the blockchain", safe=False, status=201)
 
 
-# @login_required(login_url='login')
 def pending_transaction(request):
     return JsonResponse({'pending': blockchain.unconfirmed_transactions }, status=200)
