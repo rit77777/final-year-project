@@ -1,14 +1,26 @@
 {% extends "base.html" %}
 {% block content %}
-<section style="max-width: 600px; margin: 0 auto;" class="mt-4" class="container">
-		<div class="px-4 py-5 my-5 text-center">
+<section style="max-width: 900px; margin: 0 auto;" class="container mt-4">
+	<div class="card text-center mb-3">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs">
+				<li class="nav-item">
+					<a class="nav-link active" aria-current="true"  href="{% url 'count_votes'%}">Table</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'chart_votes'%}">Chart</a>
+				</li>
+			</ul>
+		</div>
+		<div class="card-body">
+			<div class="px-4 py-2 mt-3 mb-5 text-center">
 				<h1 class="display-5 fw-bold">Result</h1>
 				<table class="table table-striped">
 				 <thead>
-						<tr >
-							<th style="text-align:center" scope="col">Candidate Name</th>
-							<th style="text-align:center" scope="col">No of Votes</th>
-						</tr>
+					<tr >
+						<th style="text-align:center" scope="col">Candidate Name</th>
+						<th style="text-align:center" scope="col">No of Votes</th>
+					</tr>
 					</thead>
 					<tbody>
 						{% for key, value in vote_count.items %}
@@ -19,6 +31,8 @@
 						{% endfor %}
 					</tbody>
 				</table>
+			</div>
 		</div>
+	</div>
 </section>
 {% endblock %}

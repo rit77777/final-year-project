@@ -113,7 +113,7 @@ def logout_page(request):
     return redirect('home')
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def home(request):
     return render(request, 'landing.html')
 
@@ -183,6 +183,17 @@ def count_votes(request):
     data = blockchain.get_result()
     print(data)
     return render(request, 'count_votes.html', {'vote_count': data})
+
+
+@login_required(login_url='login')
+def chart_votes(request):
+    data = blockchain.get_result()
+    print(data)
+    keys_data = list(data.keys())
+    print("chart", keys_data)
+    values_data = list(data.values())
+    print("chart", values_data)
+    return render(request, 'count_votes_graph.html', {'count': values_data, 'names': keys_data})
 
 
 
