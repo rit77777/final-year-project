@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<section>
-    <div class="px-4 py-5 my-5 text-center">
+<section style="max-width: 900px; margin: 0 auto;" class="container">
+    <div class="px-4 py-5 my-5 text-center card animated fadeIn">
         <h1 class="display-5 fw-bold">Successfully Voted</h1>
         <div class="col-lg-12 mx-auto">
             <p class="lead mb-4">
@@ -9,27 +9,7 @@
                 To confirm your vote please verify the information provided below
                 and mine your block to add it in the blockchain
             </p>
-            <div>Voted for {{voter_details.candidate}}</div>
-            <!-- <div class="container mb-3">
-                <div class="row justify-content-md-center">
-                    <div class="row mb-3">
-                        <div class="col col-lg-3 offset-md-2">
-                            <b>First Name: </b>{{voter_details.first_name}}
-                        </div>
-                        <div class="col col-lg-3 offset-md-2">
-                            <b>Last Name: </b>{{voter_details.last_name}}
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col col-lg-3 offset-md-2">
-                            <b>Unique ID: </b>{{voter_details.unique_id}}
-                        </div>
-                        <div class="col col-lg-3 offset-md-2">
-                            <b>Candidate: </b>{{voter_details.candidate}}
-                        </div>
-                    </div>
-                </div>
-            </div> -->
+            <div class="mb-3">Voting for <b>{{voter_details.candidate}}</b></div>
             <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
                 <a type="button" class="btn btn-dark btn-lg px-5 gap-3" href="{% url 'mine'%}">Mine</a>
             </div>

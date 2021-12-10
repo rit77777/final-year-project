@@ -2,8 +2,6 @@ from hashlib import sha256
 import datetime
 import json
 
-from .models import Candidate
-
 
 class Block:
     def __init__(self, index, transactions, timestamp, previous_hash, nonce=0):

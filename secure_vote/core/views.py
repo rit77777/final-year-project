@@ -19,14 +19,12 @@ blockchain.create_genesis_block()
 
 candidates = Candidate.objects.all()
 candidates = list(candidates)
-
 blockchain.create_candidates(candidates)
-
 
 URL = "http://127.0.0.1:8000"
 
-#########################################################################################
 
+# ------------Registration And Login-----------------------
 
 def register_page(request):
     if request.method == 'POST':
@@ -44,7 +42,6 @@ def register_page(request):
             messages.error(request, 'Unique id doesnot exists')
             return redirect('register')
 
-
         if username != unique_id_details.unique_id:
             messages.error(request, 'Unique id is invalid')
             return redirect('register')
@@ -57,8 +54,12 @@ def register_page(request):
             messages.error(request, 'phone no does not match unique id email')
             return redirect('register')
 
-        if int(age) < 18:
+        if int(age) < 18 or int(unique_id_details.age) < 18:
             messages.error(request, 'You must be 18+ to vote')
+            return redirect('register')
+
+        if int(age) != int(unique_id_details.age):
+            messages.error(request, 'Age does not match with unique_id age')
             return redirect('register')
 
         if password != password2:
@@ -94,6 +95,11 @@ def login_page(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
+        voter = RegisteredVoters.objects.get(username=username)
+        if voter.vote_done:
+            messages.error(request, 'You have already voted')
+            return redirect('login')
+
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
@@ -113,25 +119,10 @@ def logout_page(request):
     return redirect('home')
 
 
-# @login_required(login_url='login')
+# ------------Voting Phase-----------------------
+
 def home(request):
     return render(request, 'landing.html')
-
-
-@login_required(login_url='login')
-def success(request):
-    return render(request, 'success.html')
-
-
-@login_required(login_url='login')
-def mine_success(request):
-    return render(request, 'mine_success.html')
-
-
-@login_required(login_url='login')
-def mine(request):
-    requests.get(f"{URL}/mine_block/")
-    return redirect('mine_success')
 
 
 @login_required(login_url='login')
@@ -146,7 +137,6 @@ def voting(request):
 
 @login_required(login_url='login')
 def submit(request):
-
     if request.method == 'POST':
         data = request.POST
 
@@ -166,26 +156,41 @@ def submit(request):
             print(response_data)
 
             if response.status_code == 201:
-              voter.vote_done = True
-              voter.save()
-              return render(request, 'success.html', {'voter_details': data})
+                voter.vote_done = True
+                voter.save()
+                return render(request, 'success.html', {'voter_details': data})
             else:
-              return render(request, 'error.html', {'error_message': response_data['error']})
-
-            return render(request, 'success.html', {'voter_details': data})
+                return render(request, 'error.html', {'error_message': response_data['error']})
         else:
             return render(request, 'error.html', {'error_message': "NOT VALID"})
 
 
-# all votes page
 @login_required(login_url='login')
+def success(request):
+    return render(request, 'success.html')
+
+
+@login_required(login_url='login')
+def mine(request):
+    requests.get(f"{URL}/mine_block/")
+    return redirect('mine_success')
+
+
+@login_required(login_url='login')
+def mine_success(request):
+    return render(request, 'mine_success.html')
+
+
+# ------------Result-----------------------
+
+# @login_required(login_url='login')
 def count_votes(request):
     data = blockchain.get_result()
     print(data)
     return render(request, 'count_votes.html', {'vote_count': data})
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def chart_votes(request):
     data = blockchain.get_result()
     print(data)
@@ -196,9 +201,7 @@ def chart_votes(request):
     return render(request, 'count_votes_graph.html', {'count': values_data, 'names': keys_data})
 
 
-
-
-############################################################################################
+# ------------Blockchain calls-----------------------
 
 @csrf_exempt
 def new_transaction(request):
