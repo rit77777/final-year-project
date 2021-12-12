@@ -1,17 +1,20 @@
 from django.shortcuts import render, redirect
-import requests
-import datetime
-import json
-from hashlib import sha256
 from django.http import JsonResponse
-
-from .models import Candidate, RegisteredVoters, UniqueID
-from .blockchain import Blockchain
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 
+import json
+import requests
+import datetime
+from hashlib import sha256
+
+from .models import Candidate, RegisteredVoters, UniqueID
+from .blockchain import Blockchain
+
+
+# ------------Initializing blockchain-----------------------
 
 blockchain = Blockchain()
 
@@ -142,15 +145,15 @@ def submit(request):
 
         if request.user.is_authenticated:
             voter = RegisteredVoters.objects.get(username=request.user.username)
-            hash_string = str(request.user.username) + str(request.user.email) + str(request.user.name) + str(request.user.phone) + str(request.user.age)
-            hashed_value = sha256(hash_string.encode()).hexdigest()
+            voter_hash_string = str(request.user.username) + str(request.user.email) + str(request.user.name) + str(request.user.phone) + str(request.user.age)
+            voter_hashed_value = sha256(voter_hash_string.encode()).hexdigest()
 
-            post_object = {
+            vote_transaction = {
                 'candidate': request.POST.get('candidate'),
-                'voterhash': hashed_value
+                'voterhash': voter_hashed_value
             }
 
-            response = requests.post(f"{URL}/new_transaction/", json=post_object, headers={'Content-type': 'application/json'})
+            response = requests.post(f"{URL}/new_transaction/", json=vote_transaction, headers={'Content-type': 'application/json'})
 
             response_data = response.json()
             print(response_data)
@@ -183,14 +186,27 @@ def mine_success(request):
 
 # ------------Result-----------------------
 
-# @login_required(login_url='login')
+def all_votes(request):
+    vote_data = []
+    response = requests.get(f"{URL}/get_chain")
+    if response.status_code == 200:
+        chain_data = json.loads(response.content)
+        for block in chain_data["chain"]:
+            for transaction in block["transactions"]:
+                transaction["index"] = block["index"]
+                vote_data.append(transaction)
+
+        print("final", vote_data)
+    
+    return render(request, 'all_votes.html', {'vote_details': vote_data})
+
+
 def count_votes(request):
     data = blockchain.get_result()
     print(data)
     return render(request, 'count_votes.html', {'vote_count': data})
 
 
-# @login_required(login_url='login')
 def chart_votes(request):
     data = blockchain.get_result()
     print(data)

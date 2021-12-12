@@ -48,6 +48,7 @@ class Blockchain:
     def last_block(self):
         return self.chain[-1]
 
+
     def add_block(self, block, proof):
         previous_hash = self.last_block.hash
 
@@ -83,24 +84,6 @@ class Blockchain:
     @classmethod
     def is_valid_proof(cls, block, block_hash):
         return (block_hash.startswith('0' * Blockchain.difficulty) and block_hash == block.compute_hash())
-
-
-    @classmethod
-    def check_chain_validity(cls, chain):
-        result = True
-        previous_hash = "0"
-
-        for block in chain:
-            block_hash = block.hash
-            delattr(block, "hash")
-
-            if not cls.is_valid_proof(block, block_hash) or previous_hash != block.previous_hash:
-                result = False
-                break
-
-            block.hash, previous_hash = block_hash, block_hash
-
-        return result
 
 
     def mine(self):
