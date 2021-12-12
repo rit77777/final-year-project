@@ -4,4 +4,4 @@
 
 Demo Video of the project
 
-![Demo video](./demo.mkv)
+![Demo video](./demo.mp4)
