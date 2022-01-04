@@ -1,23 +1,27 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <section>
-    <div class="px-4 py-5 my-5 text-center">
-        <img
-            class="d-block mx-auto mb-4"
-            src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Election_Commission_of_India_logo.svg/1200px-Election_Commission_of_India_logo.svg.png"
-            alt=""
-            width="72"
-            height="57"
-        />
-        <h1 class="display-5 fw-bold">Vote securely</h1>
-        <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4">
-                A secure online voting system built using blockchain
-            </p>
-            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
-                <a type="button" class="btn btn-dark btn-lg px-5 gap-3" href="{% url 'voting'%}">Vote</a>
-            </div>
-        </div>
+  <div class="px-4 py-5 my-5 text-center">
+    <img
+      class="d-block mx-auto mb-4"
+      src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Election_Commission_of_India_logo.svg/1200px-Election_Commission_of_India_logo.svg.png"
+      alt=""
+      width="72"
+      height="57"
+    />
+    <h1 class="display-5 fw-bold">Vote securely</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">
+        A secure online voting system built using blockchain
+      </p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <a
+          type="button"
+          class="btn btn-dark btn-lg px-5 gap-3"
+          href="{% url 'voting'%}"
+          >Vote</a
+        >
+      </div>
     </div>
+  </div>
 </section>
 {% endblock content %}

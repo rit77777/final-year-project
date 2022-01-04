@@ -1,55 +1,78 @@
-{% extends "base.html" %}
-{% block content %}
-<section class="container" style="max-width: 500px; margin: 0 auto;" >
-    <form class="mt-4" action="{% url 'register' %}" method="POST">
-        {% csrf_token %}
-        <h1 class="mb-2">Register</h1>
-        <div class="row">
-            <div class="mb-2 col">
-                <label for="username" class="form-label">Unique ID</label>
-                <input type="text" name="username" class="form-control" id="username" required
-                />
-            </div>
-            <div class="mb-2 col">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" id="email" required
-                />
-            </div>
-        </div>
-        <div class="mb-2">
-            <label for="name" class="form-label">Name</label>
-            <input type="text" name="name" class="form-control" id="name" required
-            />
-        </div>
-        <div class="row">
-            <div class="mb-2 col">
-                <label for="phone" class="form-label">Phone</label>
-                <input type="text" name="phone" class="form-control" id="phone" required
-                />
-            </div>
-            <div class="mb-2 col">
-                <label for="age" class="form-label">Age</label>
-                <input type="text" name="age" class="form-control" id="age" required
-                />
-            </div>
-        </div>
-        <div class="mb-2">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" name="password" class="form-control" id="password" required
-            />
-        </div>
-        <div class="mb-3">
-            <label for="password2" class="form-label">Confirm Password</label>
-            <input type="password" name="password2" class="form-control" id="password2" required
-            />
-        </div>
-        <button type="submit" class="btn btn-dark">Submit</button>
-    </form>
-    <div class="mt-2 mb-3">
-        <div class="text-muted">
-            Already Have An Account? <a class="ml-2" href="{% url 'login' %}">Login</a>
-        </div>
+{% extends "base.html" %} {% block content %}
+<section class="container" style="max-width: 500px; margin: 0 auto">
+  <form class="mt-4" action="{% url 'register' %}" method="POST">
+    {% csrf_token %}
+    <h1 class="mb-2">Register</h1>
+    <div class="row">
+      <div class="mb-2 col">
+        <label for="username" class="form-label">Unique ID</label>
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          id="username"
+          required
+        />
+      </div>
+      <div class="mb-2 col">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          id="email"
+          required
+        />
+      </div>
     </div>
+    <div class="mb-2">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" name="name" class="form-control" id="name" required />
+    </div>
+    <div class="row">
+      <div class="mb-2 col">
+        <label for="phone" class="form-label">Phone</label>
+        <input
+          type="text"
+          name="phone"
+          class="form-control"
+          id="phone"
+          required
+        />
+      </div>
+      <div class="mb-2 col">
+        <label for="age" class="form-label">Age</label>
+        <input type="text" name="age" class="form-control" id="age" required />
+      </div>
+    </div>
+    <div class="mb-2">
+      <label for="password" class="form-label">Password</label>
+      <input
+        type="password"
+        name="password"
+        class="form-control"
+        id="password"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="password2" class="form-label">Confirm Password</label>
+      <input
+        type="password"
+        name="password2"
+        class="form-control"
+        id="password2"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-dark">Submit</button>
+  </form>
+  <div class="mt-2 mb-3">
+    <div class="text-muted">
+      Already Have An Account?
+      <a class="ml-2" href="{% url 'login' %}">Login</a>
+    </div>
+  </div>
 </section>
 
 {% endblock content %}

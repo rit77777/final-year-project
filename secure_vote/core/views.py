@@ -160,7 +160,7 @@ def submit(request):
 
             if response.status_code == 201:
                 voter.vote_done = True
-                voter.save()
+                voter.save()  # change this 
                 return render(request, 'success.html', {'voter_details': data})
             else:
                 return render(request, 'error.html', {'error_message': response_data['error']})
@@ -198,7 +198,15 @@ def all_votes(request):
 
         print("final", vote_data)
     
-    return render(request, 'all_votes.html', {'vote_details': vote_data})
+    print(len(blockchain.chain))
+    if len(blockchain.chain) > 1:
+        not_tampered = blockchain.is_valid_chain()
+    else:
+        not_tampered = True
+    print(not_tampered)
+    return render(request, 'all_votes.html', {'vote_details': vote_data, 'chain_not_tampered': not_tampered})
+
+    # return render(request, 'all_votes.html', {'vote_details': vote_data})
 
 
 def count_votes(request):
@@ -262,3 +270,8 @@ def mine_block(request):
 
 def pending_transaction(request):
     return JsonResponse({'pending': blockchain.unconfirmed_transactions }, status=200)
+
+
+# def tamper(request):
+#     tt = blockchain.tamper_blocks()
+#     return JsonResponse(tt, safe=False, status=200)

@@ -24,4 +24,6 @@ urlpatterns = [
     path('get_chain/', views.get_chain, name='get_chain'),
     path('mine_block/', views.mine_block, name='mine_block'),
     path('pending_transaction/', views.pending_transaction, name='pending_transaction'),
+
+    # path('tamper/', views.tamper, name='tamper'),
 ]
