@@ -132,9 +132,11 @@ def login_page(request):
 
         if not voter.account_verified:
             messages.error(request, 'Account not verified, Please verify your account')
+            otp = str(random.randint(100000, 999999))
+            voter.otp = otp
+            voter.save()
             phone = voter.phone
             request.session['phone'] = phone
-            otp = voter.otp
             send_otp(phone, otp)
             return redirect('register_otp')
 
@@ -147,7 +149,6 @@ def login_page(request):
             user.save()
             request.session['phone'] = phone
             send_otp(phone, otp)
-            # login(request, user)
             messages.success(request, 'Verify to login')
             return redirect('login_otp')
         else:
@@ -219,7 +220,7 @@ def submit(request):
 
             if response.status_code == 201:
                 voter.vote_done = True
-                voter.save()  # change this 
+                # voter.save()  # change this 
                 return render(request, 'success.html', {'voter_details': data})
             else:
                 return render(request, 'error.html', {'error_message': response_data['error']})
