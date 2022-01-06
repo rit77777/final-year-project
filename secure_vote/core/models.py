@@ -36,6 +36,8 @@ class RegisteredVoters(AbstractUser):
     email = models.EmailField(unique=True, null=True)
     phone = models.CharField(max_length=10, unique=True, null=True)
     age = models.IntegerField(default=0)
+    otp = models.CharField(max_length=6)
+    account_verified = models.BooleanField(default=False)
     vote_done = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'username'

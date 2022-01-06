@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 import json
 import requests
 import datetime
+import random
 from hashlib import sha256
 
 from .models import Candidate, RegisteredVoters, UniqueID
@@ -28,6 +29,10 @@ URL = "http://127.0.0.1:8000"
 
 
 # ------------Registration And Login-----------------------
+
+def send_otp(phone, otp):
+    print(f"phone = {phone} and otp = {otp}")
+
 
 def register_page(request):
     if request.method == 'POST':
@@ -70,7 +75,7 @@ def register_page(request):
             return redirect('register')
 
         if RegisteredVoters.objects.filter(username=username).exists():
-            messages.error(request, 'That username is taken')
+            messages.error(request, 'Voter already registered')
             return redirect('register')
 
         if RegisteredVoters.objects.filter(email=email).exists():
@@ -82,15 +87,37 @@ def register_page(request):
             return redirect('register')
 
         try:
-            user = RegisteredVoters.objects.create_user(username=username, name=name, email=email, phone=phone, age=age, password=password)
+            otp = str(random.randint(100000, 999999))
+            user = RegisteredVoters.objects.create_user(username=username, name=name, email=email, phone=phone, age=age, password=password, otp = otp)
             user.save()
+            send_otp(phone, otp)
+            request.session['phone'] = phone
             messages.success(request, 'You are now registered and can log in')
-            return redirect('login')
-        except:
+            return redirect('register_otp')
+        except: 
             messages.error(request, 'error while registering')
             return redirect('register')
     else:
         return render(request, 'register.html')
+
+
+def register_otp(request):
+    phone = request.session['phone']
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        voter = RegisteredVoters.objects.filter(phone=phone).first()
+
+        if otp == voter.otp:
+            voter.account_verified = True
+            voter.save()
+            messages.success(request, 'OTP verified, You can now log in')
+            return redirect('login')
+        else:
+            print('Wrong OTP')
+            messages.error(request, 'You entered wrong OTP')
+            return render(request, 'register_otp.html', {'phone': phone})
+    
+    return render(request, 'register_otp.html', {'phone': phone})
 
 
 def login_page(request):
@@ -103,17 +130,49 @@ def login_page(request):
             messages.error(request, 'You have already voted')
             return redirect('login')
 
+        if not voter.account_verified:
+            messages.error(request, 'Account not verified, Please verify your account')
+            phone = voter.phone
+            request.session['phone'] = phone
+            otp = voter.otp
+            send_otp(phone, otp)
+            return redirect('register_otp')
+
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            login(request, user)
-            messages.success(request, 'You are now logged in')
-            return redirect('home')
+            phone = user.phone
+            otp = str(random.randint(100000, 999999))
+            user.otp = otp
+            user.save()
+            request.session['phone'] = phone
+            send_otp(phone, otp)
+            # login(request, user)
+            messages.success(request, 'Verify to login')
+            return redirect('login_otp')
         else:
             messages.error(request, 'Invalid credentials')
             return redirect('login')
     else:
         return render(request, 'login.html')
+
+
+def login_otp(request):
+    phone = request.session['phone']
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        voter = RegisteredVoters.objects.filter(phone=phone).first()
+
+        if otp == voter.otp:
+            login(request, voter)
+            messages.success(request, 'OTP verified, Login successful')
+            return redirect('home')
+        else:
+            print('Wrong OTP')
+            messages.error(request, 'You entered wrong OTP')
+            return render(request, 'login_otp.html', {'phone': phone})
+    
+    return render(request, 'login_otp.html', {'phone': phone})
 
 
 def logout_page(request):
